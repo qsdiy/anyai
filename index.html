@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>New API</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090b;--fg:#fafafa;--muted:#52525b;--muted-fg:#a1a1aa;
+  --border:rgba(255,255,255,0.07);--card:rgba(255,255,255,0.03);
+  --blue:#3b82f6;--violet:#8b5cf6;--emerald:#10b981;
+  color-scheme:dark;
+}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;
+  background:var(--bg);color:var(--fg);line-height:1.6;overflow-x:hidden;
+  min-height:100vh}
+
+/* ── HERO ── */
+.hero{position:relative;overflow:hidden;padding:5rem 2rem 4rem;
+  background:
+    radial-gradient(ellipse 60% 50% at 15% 40%,rgba(59,130,246,.09) 0%,transparent 70%),
+    radial-gradient(ellipse 45% 40% at 85% 20%,rgba(139,92,246,.07) 0%,transparent 70%)}
+.grid-bg{position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(var(--border) 1px,transparent 1px),
+    linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(ellipse 75% 60% at 50% 30%,black 5%,transparent 100%);
+  opacity:.5}
+.hero-inner{position:relative;z-index:1;max-width:1080px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+
+/* badge */
+.badge{display:inline-flex;align-items:center;gap:7px;
+  background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.22);
+  color:#93c5fd;font-size:11px;font-weight:600;
+  padding:5px 13px;border-radius:99px;letter-spacing:.04em;margin-bottom:1.25rem}
+.badge-dot{width:7px;height:7px;border-radius:50%;background:#3b82f6;flex-shrink:0;
+  animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(59,130,246,.5)}
+  50%{box-shadow:0 0 0 5px rgba(59,130,246,0)}}
+
+h1{font-size:clamp(1.9rem,3.5vw,2.85rem);font-weight:800;
+  line-height:1.15;letter-spacing:-.025em;margin-bottom:1.1rem}
+.grad{background:linear-gradient(135deg,#60a5fa 0%,#a78bfa 55%,#c084fc 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.desc{font-size:14.5px;color:var(--muted-fg);line-height:1.75;max-width:420px;margin-bottom:1.75rem}
+
+/* buttons */
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:2rem}
+.btn{display:inline-flex;align-items:center;gap:7px;
+  padding:9px 20px;border-radius:9px;font-size:13.5px;font-weight:500;
+  text-decoration:none;border:none;cursor:pointer;transition:all .2s;line-height:1}
+.btn-p{background:#3b82f6;color:#fff;box-shadow:0 0 20px rgba(59,130,246,.25)}
+.btn-p:hover{background:#2563eb;box-shadow:0 0 30px rgba(59,130,246,.4)}
+.btn-o{background:transparent;color:var(--muted-fg);border:1px solid var(--border)}
+.btn-o:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.15);color:var(--fg)}
+
+/* url bar */
+.urlbar{display:flex;align-items:center;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:9px;overflow:hidden;
+  font-size:12.5px;font-family:'SF Mono','Fira Code',monospace;margin-bottom:1.75rem}
+.urlbar-base{padding:9px 14px;color:var(--muted-fg);border-right:1px solid var(--border);white-space:nowrap}
+.urlbar-path{padding:9px 14px;color:#60a5fa;flex:1}
+
+/* chips */
+.chip-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(255,255,255,.3);margin-bottom:.5rem;display:block}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:99px;
+  border:1px solid var(--border);background:rgba(255,255,255,.03);
+  font-size:12px;font-weight:500;color:rgba(255,255,255,.65);
+  text-decoration:none;transition:all .2s}
+.chip:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.18);color:var(--fg)}
+
+/* ── TERMINAL ── */
+.terminal{background:rgba(255,255,255,.025);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,.3),0 0 0 1px rgba(255,255,255,.04);
+  font-family:'SF Mono','Fira Code',monospace}
+.t-header{display:flex;align-items:center;gap:7px;padding:11px 15px;
+  border-bottom:1px solid var(--border);background:rgba(0,0,0,.25)}
+.dot{width:11px;height:11px;border-radius:50%}
+.dr{background:#ef4444}.da{background:#f59e0b}.dg{background:#22c55e}
+.t-label{margin-left:6px;font-size:11px;color:var(--muted-fg)}
+
+/* CSS-only tabs */
+.t-radio{position:absolute;opacity:0;pointer-events:none}
+.tabs{display:flex;border-bottom:1px solid var(--border);background:rgba(0,0,0,.2)}
+.tab-lbl{padding:9px 16px;font-size:11.5px;font-weight:500;cursor:pointer;
+  color:var(--muted-fg);border-bottom:2px solid transparent;
+  transition:color .2s,border-color .2s;white-space:nowrap;
+  font-family:'SF Mono','Fira Code',monospace;user-select:none}
+.panels{min-height:200px}
+.panel{display:none;padding:16px;font-size:12px;line-height:1.75}
+
+#t1:checked~.tw .tabs [for=t1],
+#t2:checked~.tw .tabs [for=t2],
+#t3:checked~.tw .tabs [for=t3],
+#t4:checked~.tw .tabs [for=t4]{color:#60a5fa;border-bottom-color:#60a5fa}
+#t1:checked~.tw .panels #p1,
+#t2:checked~.tw .panels #p2,
+#t3:checked~.tw .panels #p3,
+#t4:checked~.tw .panels #p4{display:block}
+
+.cm{color:var(--muted-fg);opacity:.6}
+.ck{color:#a78bfa}.cv{color:#34d399}.ce{color:#60a5fa}.cx{color:#f97316}
+.bp{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;
+  font-weight:800;letter-spacing:.04em;background:rgba(249,115,22,.15);color:#f97316;
+  vertical-align:middle;margin-right:4px}
+.t-foot{border-top:1px solid var(--border);padding:9px 15px;
+  display:flex;gap:14px;align-items:center;
+  background:rgba(0,0,0,.2);font-size:11px;color:var(--muted-fg);
+  font-family:'SF Mono','Fira Code',monospace}
+.ok{display:inline-flex;align-items:center;gap:5px;
+  background:rgba(16,185,129,.1);border-radius:5px;padding:3px 8px;color:#10b981}
+.hi{color:var(--fg);font-weight:600}
+
+/* ── STATS ── */
+.stats{border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,.015)}
+.stats-g{max-width:1080px;margin:0 auto;
+  display:grid;grid-template-columns:repeat(4,1fr);padding:2.5rem 2rem}
+.stat{text-align:center;padding:0 .75rem;border-right:1px solid var(--border)}
+.stat:last-child{border-right:none}
+.stat-n{font-size:2rem;font-weight:800;letter-spacing:-.02em;display:block;
+  background:linear-gradient(135deg,#f0f0f0,#71717a);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-l{font-size:12px;color:var(--muted-fg);margin-top:4px;display:block}
+
+/* ── FEATURES ── */
+.section{padding:4rem 2rem}
+.sec{max-width:1080px;margin:0 auto}
+.eyebrow{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--blue);margin-bottom:.75rem}
+h2{font-size:clamp(1.5rem,2.8vw,2rem);font-weight:800;
+  letter-spacing:-.02em;margin-bottom:.65rem}
+.sdesc{color:var(--muted-fg);font-size:14.5px;max-width:500px}
+
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--border);border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;margin-top:2.5rem}
+.feat{padding:1.75rem;background:var(--bg);transition:background .2s}
+.feat:hover{background:rgba(255,255,255,.025)}
+.ficon{width:34px;height:34px;border-radius:8px;display:flex;
+  align-items:center;justify-content:center;font-size:16px;margin-bottom:.9rem}
+.ib{background:rgba(59,130,246,.12)}.ie{background:rgba(16,185,129,.12)}
+.ia{background:rgba(245,158,11,.12)}.iv{background:rgba(139,92,246,.12)}
+.ir{background:rgba(244,63,94,.12)}.ic{background:rgba(6,182,212,.12)}
+.ft{font-size:14px;font-weight:700;margin-bottom:.4rem}
+.fd{font-size:12.5px;color:var(--muted-fg);line-height:1.65}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.tag{font-size:10.5px;padding:3px 9px;border-radius:5px;
+  border:1px solid var(--border);color:var(--muted-fg)}
+
+/* ── STEPS ── */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2.5rem}
+.step{padding:1.5rem;background:var(--card);
+  border:1px solid var(--border);border-radius:12px;transition:all .2s}
+.step:hover{border-color:rgba(255,255,255,.16);background:rgba(255,255,255,.05)}
+.snum{font-size:10.5px;font-weight:800;letter-spacing:.08em;
+  color:var(--muted-fg);margin-bottom:.65rem;display:block;
+  font-family:'SF Mono','Fira Code',monospace}
+.stitle{font-size:14.5px;font-weight:700;margin-bottom:.4rem}
+.sdesc2{font-size:12.5px;color:var(--muted-fg);line-height:1.65}
+
+/* ── CTA ── */
+.cta{padding:4rem 2rem;text-align:center;
+  border-top:1px solid var(--border);
+  background:radial-gradient(ellipse 55% 45% at 50% 100%,rgba(59,130,246,.06) 0%,transparent 70%)}
+.cta h2{font-size:clamp(1.65rem,3vw,2.25rem);font-weight:800;
+  letter-spacing:-.02em;margin-bottom:.85rem;line-height:1.2}
+.cta p{font-size:14.5px;color:var(--muted-fg);margin-bottom:1.75rem}
+.cta-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+
+/* ── FADE IN ── */
+@keyframes fi{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.fi{animation:fi .55s ease both}
+.fi1{animation-delay:.07s}.fi2{animation-delay:.14s}
+.fi3{animation-delay:.21s}.fi4{animation-delay:.28s}.fi5{animation-delay:.35s}
+
+/* ── RESPONSIVE ── */
+@media(max-width:860px){
+  .hero-inner{grid-template-columns:1fr}
+  .feat-grid{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr}
+  .stats-g{grid-template-columns:1fr 1fr}
+  .stat{border-right:none;border-bottom:1px solid var(--border);padding:.75rem 0}
+  .stat:last-child,.stat:nth-child(2){border-bottom:none}
+}
+@media(max-width:560px){
+  .feat-grid{grid-template-columns:1fr}
+  .hero{padding:3rem 1rem 2.5rem}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="grid-bg"></div>
+  <div class="hero-inner">
+
+    <!-- Left -->
+    <div>
+      <div class="badge fi"><span class="badge-dot"></span>AI 应用基础设施底座</div>
+      <h1 class="fi fi1">统一 API 网关<br>接入<span class="grad">海量 AI 模型</span></h1>
+      <p class="desc fi fi2">通过标准化统一 API 协议访问海量模型，支持 OpenAI、Claude、Gemini 等多格式互转，驱动 AI 应用、管理数字资产、连接未来。</p>
+      <div class="actions fi fi3">
+        <a href="/token" class="btn btn-p">▶ &nbsp;获取密钥</a>
+        <a href="https://docs.newapi.pro" target="_blank" rel="noopener" class="btn btn-o">📄 &nbsp;查看文档</a>
+      </div>
+      <div class="urlbar fi fi4">
+        <span class="urlbar-base">http://localhost:3000</span>
+        <span class="urlbar-path">/v1/chat/completions</span>
+      </div>
+      <div class="fi fi5">
+        <span class="chip-label">支持接入的应用</span>
+        <div class="chips">
+          <a href="https://cherry-ai.com" target="_blank" rel="noopener" class="chip">🍒 Cherry Studio</a>
+          <a href="https://ccswitch.io" target="_blank" rel="noopener" class="chip">🔀 CC Switch</a>
+          <span class="chip" style="opacity:.6;cursor:default">••• 更多应用</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: CSS-only tab terminal -->
+    <div class="fi fi2">
+      <input type="radio" name="t" id="t1" class="t-radio" checked>
+      <input type="radio" name="t" id="t2" class="t-radio">
+      <input type="radio" name="t" id="t3" class="t-radio">
+      <input type="radio" name="t" id="t4" class="t-radio">
+      <div class="terminal">
+        <div class="t-header">
+          <span class="dot dr"></span><span class="dot da"></span><span class="dot dg"></span>
+          <em class="t-label">API 演示</em>
+        </div>
+        <div class="tw">
+          <div class="tabs">
+            <label for="t1" class="tab-lbl">Chat</label>
+            <label for="t2" class="tab-lbl">Responses</label>
+            <label for="t3" class="tab-lbl">Claude</label>
+            <label for="t4" class="tab-lbl">Images</label>
+          </div>
+          <div class="panels">
+            <div id="p1" class="panel">
+              <div><span class="bp">POST</span><span class="ce">/v1/chat/completions</span></div><br>
+              <div class="cm">// headers</div>
+              <div><span class="ck">"Authorization"</span>: <span class="cv">"Bearer sk-••••"</span></div><br>
+              <div>{</div>
+              <div>&nbsp; <span class="ck">"model"</span>: <span class="cv">"gpt-4o"</span>,</div>
+              <div>&nbsp; <span class="ck">"messages"</span>: [{ <span class="ck">"role"</span>: <span class="cv">"user"</span>, <span class="ck">"content"</span>: <span class="cv">"你好！"</span> }]</div>
+              <div>}</div>
+            </div>
+            <div id="p2" class="panel">
+              <div><span class="bp">POST</span><span class="ce">/v1/responses</span></div><br>
+              <div class="cm">// OpenAI Responses API</div>
+              <div><span class="ck">"Authorization"</span>: <span class="cv">"Bearer sk-••••"</span></div><br>
+              <div>{ <span class="ck">"model"</span>: <span class="cv">"gpt-4o"</span>, <span class="ck">"input"</span>: <span class="cv">"..."</span> }</div><br>
+              <div class="cm">// Response</div>
+              <div>{ <span class="ck">"output"</span>: [{ <span class="ck">"type"</span>: <span class="cv">"output_text"</span> }] }</div>
+            </div>
+            <div id="p3" class="panel">
+              <div><span class="bp">POST</span><span class="ce">/v1/messages</span></div><br>
+              <div class="cm">// Claude Messages API</div>
+              <div><span class="ck">"x-api-key"</span>: <span class="cv">"sk-••••"</span></div>
+              <div><span class="ck">"anthropic-version"</span>: <span class="cv">"2023-06-01"</span></div><br>
+              <div>{ <span class="ck">"model"</span>: <span class="cv">"claude-3-5-sonnet-20241022"</span>, <span class="ck">"max_tokens"</span>: <span class="cx">1024</span>, <span class="ck">"messages"</span>: [...] }</div>
+            </div>
+            <div id="p4" class="panel">
+              <div><span class="bp">POST</span><span class="ce">/v1/images/edits</span></div><br>
+              <div class="cm">// Image generation</div>
+              <div><span class="ck">"Authorization"</span>: <span class="cv">"Bearer sk-••••"</span></div><br>
+              <div>{ <span class="ck">"model"</span>: <span class="cv">"gpt-image-1"</span>, <span class="ck">"prompt"</span>: <span class="cv">"A futuristic city"</span>, <span class="ck">"n"</span>: <span class="cx">1</span> }</div>
+            </div>
+          </div>
+        </div>
+        <div class="t-foot">
+          <span class="ok">✓ 已连接</span>
+          <span>延迟 <span class="hi">142ms</span></span>
+          <span>Token <span class="hi">27</span></span>
+          <span style="margin-left:auto">v1.8.0</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stats-g">
+    <div class="stat"><span class="stat-n">50+</span><span class="stat-l">上游服务接入</span></div>
+    <div class="stat"><span class="stat-n">100+</span><span class="stat-l">模型计费支持</span></div>
+    <div class="stat"><span class="stat-n">50+</span><span class="stat-l">兼容 API 路由</span></div>
+    <div class="stat"><span class="stat-n">10+</span><span class="stat-l">调度控制策略</span></div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="section">
+  <div class="sec">
+    <span class="eyebrow">核心功能</span>
+    <h2>一个网关，驾驭所有模型</h2>
+    <p class="sdesc">统一协议接入，无需为每个 AI 服务商单独适配，专注于构建你的产品。</p>
+    <div class="feat-grid">
+      <div class="feat"><div class="ficon ib">⚡</div><p class="ft">极速路由</p><p class="fd">加权随机 + 失败自动重试，优先级调度，服务永不中断。</p><div class="tags"><span class="tag">OpenAI</span><span class="tag">Claude</span><span class="tag">Gemini</span><span class="tag">DeepSeek</span><span class="tag">Qwen</span></div></div>
+      <div class="feat"><div class="ficon ie">🔐</div><p class="ft">安全可靠</p><p class="fd">支持 Discord / Telegram / OIDC 多方式认证，令牌分组与模型访问控制。</p></div>
+      <div class="feat"><div class="ficon ia">💰</div><p class="ft">精细计费</p><p class="fd">按次、按量、缓存命中成本核算，支持多模型精细计费统计。</p></div>
+      <div class="feat"><div class="ficon iv">🔄</div><p class="ft">格式转换</p><p class="fd">OpenAI ⇄ Claude ⇄ Gemini，多格式无缝互转，一套代码接入所有模型。</p></div>
+      <div class="feat"><div class="ficon ir">📊</div><p class="ft">可视化看板</p><p class="fd">实时统计分析、用量监控，支持中文、英文、法语、日语多语言界面。</p></div>
+      <div class="feat"><div class="ficon ic">🌐</div><p class="ft">多协议支持</p><p class="fd">Responses API、Realtime API、Claude Messages、Rerank 全面兼容。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" style="padding-top:0">
+  <div class="sec">
+    <span class="eyebrow">快速上手</span>
+    <h2>三步接入，即刻启用</h2>
+    <p class="sdesc">从部署到调用，最快几分钟完成全流程配置。</p>
+    <div class="steps">
+      <div class="step"><span class="snum">01</span><p class="stitle">部署实例</p><p class="sdesc2">通过 Docker Compose 一键启动，支持 SQLite 与 MySQL，5 分钟完成部署。</p></div>
+      <div class="step"><span class="snum">02</span><p class="stitle">配置渠道</p><p class="sdesc2">在控制台添加上游 API Key，配置模型分组、计费策略与权限规则。</p></div>
+      <div class="step"><span class="snum">03</span><p class="stitle">调用 API</p><p class="sdesc2">使用统一端点和令牌，以标准格式调用所有接入的模型服务，零改造成本。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta">
+  <div style="max-width:600px;margin:0 auto">
+    <h2>立即开始构建<br><span class="grad">你的 AI 应用</span></h2>
+    <p>加入已经在使用 New API 的开发者与团队，用统一网关接入无限 AI 能力。</p>
+    <div class="cta-row">
+      <a href="/sign-up" class="btn btn-p" style="padding:10px 22px;font-size:14px;border-radius:10px">▶ &nbsp;免费注册</a>
+      <a href="https://github.com/QuantumNous/new-api" target="_blank" rel="noopener" class="btn btn-o" style="padding:10px 22px;font-size:14px;border-radius:10px">GitHub →</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
